@@ -1,20 +1,24 @@
 <script>
 export default {
   props: {
+    // 从父组件接收的单个书签对象
     bookmark: {
-      type: Object,
-      required: true
+      type: Object,     // 必须是对象类型
+      required: true    // 必须传递此属性
     }
   },
   computed: {
+    // 计算属性：将时间戳格式化为易读日期
     formattedDate() {
-      const timestamp = Number(this.bookmark.id);
-      if (isNaN(timestamp)) return '日期无效';
-      const date = new Date(timestamp);
+      const timestamp = Number(this.bookmark.id);  // 转换ID为数字
+      if (isNaN(timestamp)) return '日期无效';     // 无效ID处理
+
+      const date = new Date(timestamp);  // 创建日期对象
+      // 格式化为中文日期（例：2025年8月3日）
       return date.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+        year: 'numeric',  // 显示年份
+        month: 'short',   // 月份简写（如"8月"）
+        day: 'numeric'    // 显示日期
       })
     }
   }
@@ -22,21 +26,30 @@ export default {
 </script>
 
 <template>
-<div class="bookmark-item">
-  <div class="bookmark-content">
-    <a :href="bookmark.url" target="_blank" class="bookmark-link">
-      <h3>{{bookmark.title}}</h3>
-      <p class="url">{{bookmark.url}}</p>
-    </a>
-    <div class="bookmark-meta">
-      <span v-if="bookmark.category" class="category">{{bookmark.category}}</span>
-      <span class="date">{{formattedDate}}</span>
+  <div class="bookmark-item">
+    <div class="bookmark-content">
+      <!-- 书签链接：在新标签页打开 -->
+      <a :href="bookmark.url" target="_blank" class="bookmark-link">
+        <h3>{{bookmark.title}}</h3>  <!-- 显示书签标题 -->
+        <p class="url">{{bookmark.url}}</p>  <!-- 显示URL -->
+      </a>
+
+      <!-- 书签元信息 -->
+      <div class="bookmark-meta">
+        <!-- 显示分类（如果有category） -->
+        <span v-if="bookmark.category" class="category">
+        {{bookmark.category}}
+      </span>
+        <!-- 显示格式化后的添加日期 -->
+        <span class="date">{{formattedDate}}</span>
+      </div>
     </div>
+
+    <!-- 删除按钮：点击时触发remove事件并传递书签ID -->
+    <button @click="$emit('remove', bookmark.id)" class="del-btn">
+      <i class="fas fa-trash"></i>  <!-- 删除图标 -->
+    </button>
   </div>
-  <button @click="$emit('remove', bookmark.id)" class="del-btn">
-    <i class="fas fa-trash"></i>
-  </button>
-</div>
 </template>
 
 <style scoped>

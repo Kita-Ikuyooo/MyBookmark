@@ -1,17 +1,23 @@
 <template>
   <div class="app">
+    <!-- 页头 -->
     <header>
       <h1><i class="fas fa-bookmark"></i>我的书签收藏夹</h1>
       <p class="subtitle">轻松保存和管理您喜欢的网站</p>
     </header>
 
+    <!-- 主内容区 -->
     <main>
+      <!-- 书签表单组件：监听add事件 -->
       <BookmarkForm @add="addBookmark" />
+
+      <!-- 书签列表组件：传递书签数据，监听remove事件 -->
       <BookmarkList
           :bookmarks="bookmarks"
           @remove="removeBookmark"/>
     </main>
 
+    <!-- 页脚：显示书签总数 -->
     <footer>
       <p>© 2025 我的书签 | 已保存 {{ bookmarks.length }} 个书签</p>
     </footer>
@@ -19,44 +25,50 @@
 </template>
 
 <script>
+// 导入子组件
 import BookmarkForm from './components/BookmarkForm.vue';
 import BookmarkList from './components/BookmarkList.vue';
 
 export default {
   components: {
+    // 注册子组件
     BookmarkForm,
     BookmarkList
   },
   data() {
     return {
-      bookmarks: []
+      bookmarks: []  // 存储所有书签的数组
     }
   },
+  // 生命周期钩子：组件挂载后加载本地存储的书签
   mounted() {
     this.loadBookmarks();
   },
   methods: {
-    // 添加书签
+    // 添加书签方法
     addBookmark(bookmark) {
-      this.bookmarks.push(bookmark);
-      this.saveBookmarks();
+      this.bookmarks.push(bookmark);  // 将新书签添加到数组
+      this.saveBookmarks();           // 保存到本地存储
     },
 
-    // 删除书签
+    // 删除书签方法
     removeBookmark(id) {
+      // 过滤掉指定ID的书签
       this.bookmarks = this.bookmarks.filter(b => b.id !== id);
-      this.saveBookmarks();
+      this.saveBookmarks();  // 保存到本地存储
     },
 
-    // 保存到本地存储
+    // 保存书签到浏览器的本地存储
     saveBookmarks() {
+      // 将书签数组转为JSON字符串存储
       localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks));
     },
 
-    // 从本地存储加载
+    // 从本地存储加载书签
     loadBookmarks() {
-      const saved = localStorage.getItem('bookmarks');
+      const saved = localStorage.getItem('bookmarks');  // 获取存储数据
       if (saved) {
+        // 将JSON字符串解析为JavaScript数组
         this.bookmarks = JSON.parse(saved);
       }
     }

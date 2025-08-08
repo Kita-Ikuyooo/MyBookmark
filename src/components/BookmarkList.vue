@@ -1,41 +1,49 @@
 <script>
-import BookmarkItem from "./BookmarkItem.vue";
+import BookmarkItem from "./BookmarkItem.vue";  // 导入书签项子组件
 
 export default {
   components: {
-    BookmarkItem
+    BookmarkItem  // 注册子组件
   },
   props: {
+    // 从父组件接收的书签数组
     bookmarks: {
-      type: Array,
-      required: true
+      type: Array,     // 必须是数组类型
+      required: true   // 必须传递此属性
     }
   },
   data() {
     return {
-      searchQuery: '',
-      categoryFilter: ''
+      searchQuery: '',     // 存储搜索关键词
+      categoryFilter: ''   // 存储当前选择的分类筛选值
     }
   },
   computed: {
+    // 计算属性：获取所有不重复的书签分类
     categories() {
-      const categories = new Set();
+      const categories = new Set();  // 使用Set去重
       this.bookmarks.forEach(bookmark => {
         if (bookmark.category) {
-          categories.add(bookmark.category);
+          categories.add(bookmark.category);  // 添加非空分类
         }
       });
-      return Array.from(categories).sort();
+      return Array.from(categories).sort();  // 转为数组并排序
     },
+
+    // 计算属性：根据搜索条件和分类筛选书签
     filteredBookmarks() {
       return this.bookmarks.filter(bookmark => {
+        // 检查是否匹配搜索词（标题/URL/分类中任一匹配）
         const matchesSearch =
             bookmark.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
             bookmark.url.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
             (bookmark.category && bookmark.category.toLowerCase().includes(this.searchQuery.toLowerCase()));
+
+        // 检查是否匹配当前选择的分类（未选择分类时显示全部）
         const matchesCategory = !this.categoryFilter ||
             (bookmark.category === this.categoryFilter);
 
+        // 同时满足搜索和分类条件
         return matchesSearch && matchesCategory;
       });
     }
@@ -44,40 +52,53 @@ export default {
 </script>
 
 <template>
-<div class="bookmark-list">
-  <div class="list-header">
-    <h2>我的书签</h2>
-  </div>
-  <div class="controls">
-    <input
-      type="text"
-      v-model="searchQuery"
-      placeholder="搜索书签"
-      class="search-input">
-    <select v-model="categoryFilter" class="category-sel">
-      <option value="">所有分类</option>
-      <option v-for="category in categories" :value="category" :key="category">{{category}}</option>
-    </select>
-  </div>
-</div>
+  <div class="bookmark-list">
+    <div class="list-header">
+      <h2>我的书签</h2>
+    </div>
 
-<div v-if="filteredBookmarks.length" class="bookmarks-container">
+    <!-- 控制区域：搜索和分类筛选 -->
+    <div class="controls">
+      <!-- 搜索输入框：双向绑定到searchQuery -->
+      <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="搜索书签"
+          class="search-input">
+
+      <!-- 分类筛选下拉框：双向绑定到categoryFilter -->
+      <select v-model="categoryFilter" class="category-sel">
+        <option value="">所有分类</option>
+        <!-- 动态生成分类选项 -->
+        <option v-for="category in categories" :value="category" :key="category">
+          {{category}}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 根据筛选结果显示不同内容 -->
+  <div v-if="filteredBookmarks.length" class="bookmarks-container">
+    <!-- 遍历显示筛选后的书签 -->
     <BookmarkItem
-      v-for="bookmark in filteredBookmarks"
-      :key="bookmark.id"
-      :bookmark="bookmark"
-      @remove="$emit('remove', bookmark.id)"
+        v-for="bookmark in filteredBookmarks"
+    :key="bookmark.id"
+    :bookmark="bookmark"
+    @remove="$emit('remove', bookmark.id)"
     />
-</div>
+  </div>
 
-<div v-else class="empty-state">
-  <i class="fas fa-bookmark"></i>
-  <p>{{searchQuery || categoryFilter ? '没有匹配的书签' : '暂无书签，请添加'}}</p>
-</div>
+  <!-- 当没有书签时显示的空状态 -->
+  <div v-else class="empty-state">
+    <i class="fas fa-bookmark"></i>
+    <!-- 根据是否有筛选条件显示不同提示 -->
+    <p>{{searchQuery || categoryFilter ? '没有匹配的书签' : '暂无书签，请添加'}}</p>
+  </div>
 
-<div class="stats">
-  共 {{bookmarks.length}} 个书签 | 显示 {{filteredBookmarks.length}} 个
-</div>
+  <!-- 书签统计信息 -->
+  <div class="stats">
+    共 {{bookmarks.length}} 个书签 | 显示 {{filteredBookmarks.length}} 个
+  </div>
 </template>
 
 <style scoped>

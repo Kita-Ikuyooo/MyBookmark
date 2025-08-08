@@ -1,23 +1,28 @@
 <script>
 export default {
+  // 组件数据：定义存储新书签信息的对象
   data() {
     return {
-      newBookmark: {
-        title: '',
-        url: '',
-        category: ''
+      newBookmark: {  // 存储用户输入的书签信息
+        title: '',   // 书签标题
+        url: '',     // 书签网址
+        category: '' // 书签分类（可选）
       }
     }
   },
   methods: {
+    // 添加书签方法
     addBookmark() {
+      // 创建新书签对象，包含用户输入数据和自动生成的ID（使用时间戳）
       const bookmark = {
-        ...this.newBookmark,
-        id: Date.now()
+        ...this.newBookmark,  // 展开用户输入的数据
+        id: Date.now()         // 用当前时间戳作为唯一ID
       };
 
+      // 触发'add'事件，将新书签传递给父组件
       this.$emit('add', bookmark);
 
+      // 清空表单输入
       this.newBookmark.title = '';
       this.newBookmark.url = '';
       this.newBookmark.category = '';
@@ -27,26 +32,34 @@ export default {
 </script>
 
 <template>
-<div class="bookmark-form">
-  <h3>添加您的新书签</h3>
-  <form @submit.prevent="addBookmark">
-    <input
-      type="text"
-      v-model="newBookmark.title"
-      placeholder="书签名称"
-      required>
-    <input
-      type="url"
-      v-model="newBookmark.url"
-      placeholder="书签地址"
-      required>
-    <input
-      type="text"
-      v-model="newBookmark.category"
-      placeholder="书签分类（可选）">
-    <button type="submit">添加书签</button>
-  </form>
-</div>
+  <div class="bookmark-form">
+    <h3>添加您的新书签</h3>
+    <!-- 表单提交时阻止默认刷新行为，触发addBookmark方法 -->
+    <form @submit.prevent="addBookmark">
+      <!-- 标题输入框：双向绑定到newBookmark.title -->
+      <input
+          type="text"
+          v-model="newBookmark.title"
+          placeholder="书签名称"
+          required>  <!-- 必填项 -->
+
+      <!-- 网址输入框：双向绑定到newBookmark.url -->
+      <input
+          type="url"
+          v-model="newBookmark.url"
+          placeholder="书签地址"
+          required>  <!-- 必填项，浏览器会验证URL格式 -->
+
+      <!-- 分类输入框：双向绑定到newBookmark.category -->
+      <input
+          type="text"
+          v-model="newBookmark.category"
+          placeholder="书签分类（可选）">
+
+      <!-- 提交按钮 -->
+      <button type="submit">添加书签</button>
+    </form>
+  </div>
 </template>
 
 <style scoped>
